@@ -3,6 +3,8 @@
 [RequireComponent(typeof(Rigidbody2D))]
 public class RonaPawn : MonoBehaviour
 {
+    public Camera mainCamera = null;
+    
     public float acceleration = .001f;
     public float maxAcceleration = .01f;
     private float currentUpVelocity = 0;
@@ -11,12 +13,13 @@ public class RonaPawn : MonoBehaviour
     private Vector2 _startingCameraLocation;
     private Vector2 _targetCameraLocation;
     private float _elapsedTime;
-
+    
     private Rigidbody2D _rigidBody = null;
     
     void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
+        mainCamera = Camera.main;
     }
     
     void Update()
@@ -33,5 +36,6 @@ public class RonaPawn : MonoBehaviour
         
         currentUpVelocity = Mathf.Clamp(currentUpVelocity / 2, -maxAcceleration, maxAcceleration);
         currentRightVelocity = Mathf.Clamp(currentRightVelocity / 2, -maxAcceleration, maxAcceleration);
+        mainCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
     }
 }

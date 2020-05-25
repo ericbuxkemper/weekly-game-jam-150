@@ -26,6 +26,11 @@ public class SceneLoaderUI : MonoBehaviour
             _loadSceneRoutine = StartCoroutine(WaitForSceneToLoad(sceneName));
     }
 
+    public void TestButton()
+    {
+        NarrativeText.Instance.ShowText("TESTING THE NARRATIVE TEXT BOX............");
+    }
+
     private IEnumerator WaitForSceneToLoad(string sceneName)
     {
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
