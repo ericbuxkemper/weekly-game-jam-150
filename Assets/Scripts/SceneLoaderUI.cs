@@ -12,6 +12,7 @@ public class SceneLoaderUI : MonoBehaviour
     private Coroutine _hideLoadingScreenRoutine = null;
     private bool shouldHideLoadingScreen = false;
     [SerializeField] private Image _loadingPane = null;
+    private AsyncOperation _asyncLoad;
 
     private float _loadingPaneWidth;
     
@@ -33,13 +34,15 @@ public class SceneLoaderUI : MonoBehaviour
 
     private IEnumerator WaitForSceneToLoad(string sceneName)
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        _asyncLoad = SceneManager.LoadSceneAsync(sceneName);
+        _asyncLoad.allowSceneActivation = false;
         if (_showLoadingScreenRoutine == null)
             _showLoadingScreenRoutine = StartCoroutine(ShowLoadingScreen());
         while (true)
         {
             yield return null;
-            if (!asyncLoad.isDone) continue;
+            Debug.Log(_asyncLoad.progress);
+            if (_asyncLoad.progress > .9f) continue;
             _loadSceneRoutine = null;
             if (_showLoadingScreenRoutine == null)
                 StartCoroutine(HideLoadingScreen());
@@ -58,7 +61,7 @@ public class SceneLoaderUI : MonoBehaviour
             .SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Camera.main.pixelHeight / transform.localScale.x);
         
         float elapsedTime = 0;
-        float loadingTime = 1.5f;
+        float loadingTime = 1f;
         while (elapsedTime < loadingTime)
         {
             elapsedTime += Time.deltaTime;
@@ -71,21 +74,22 @@ public class SceneLoaderUI : MonoBehaviour
             _hideLoadingScreenRoutine = StartCoroutine(HideLoadingScreen());
 
         _showLoadingScreenRoutine = null;
-        _loadingPane.transform.position = new Vector3(Camera.main.pixelWidth, 0, 0);
+        ((RectTransform)_loadingPane.transform).anchoredPosition = new Vector3(Camera.main.pixelWidth, 0, 0);
     }
 
     private IEnumerator HideLoadingScreen()
     {
         float elapsedTime = 0;
-        float loadingTime = 1.5f;
+        float loadingTime = 1f;
         while (elapsedTime < loadingTime)
         {
             elapsedTime += Time.deltaTime;
-            _loadingPane.transform.position = Vector3.Slerp(new Vector3(Camera.main.pixelWidth, 0, 0), Vector3.zero, elapsedTime / loadingTime);
+            ((RectTransform)_loadingPane.transform).anchoredPosition = Vector3.Slerp(new Vector3(Camera.main.pixelWidth, 0, 0), Vector3.zero, elapsedTime / loadingTime);
             // TODO: Lerp loading menu onto viewport
             yield return null;
         }
 
+        _asyncLoad.allowSceneActivation = true;
         _hideLoadingScreenRoutine = null;
         _loadingPane.transform.position = Vector3.zero;
         GetComponent<Canvas>().enabled = false;

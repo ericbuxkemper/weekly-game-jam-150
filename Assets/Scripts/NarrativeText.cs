@@ -34,25 +34,25 @@ public class NarrativeText : SingletonPrefabBehaviour<NarrativeText>
         _Text.text = "";
         float elapsedTime = 0;
         _Canvas.enabled = true;
+        float startingY = _TextContainer.transform.position.y;
         while (elapsedTime < popInTime) {
             elapsedTime += Time.deltaTime;
             var targetY = Mathf.Lerp(_hiddenYPosition, _activeYPosition, elapsedTime / popInTime);
-            Debug.Log(targetY);
-            ((RectTransform)_TextContainer.transform).localPosition = new Vector3(0, targetY, 0);
+            ((RectTransform)_TextContainer.transform).anchoredPosition = new Vector3(0, targetY, 0);
             yield return null;
         }
         
         foreach (var character in text) {
             _Text.text += character;
-            yield return new WaitForSeconds(perCharacterDelay + Random.Range(-.5f,.5f));
+            yield return new WaitForSeconds(perCharacterDelay);
         }
 
         yield return new WaitForSeconds(2f);
         elapsedTime = 0;
         while (elapsedTime < popInTime) {
             elapsedTime += Time.deltaTime;
-            var targetY = Mathf.Lerp(_activeYPosition, _hiddenYPosition, elapsedTime / popInTime);
-            ((RectTransform)_TextContainer.transform).localPosition = new Vector3(0, targetY, 0);
+            var targetY = Mathf.Lerp(startingY + _hiddenYPosition, startingY, elapsedTime / popInTime);
+            ((RectTransform)_TextContainer.transform).anchoredPosition = new Vector3(0, targetY, 0);
             yield return null;
         }
 
